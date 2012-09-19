@@ -282,12 +282,6 @@ endif
 source "fs/nls/Kconfig"
 source "fs/dlm/Kconfig"
 
-config DYNAMIC_FSYNC
-	bool "dynamic file sync control"
-	default n
-	help
-	  An experimental file sync control using Android's early suspend / late resume drivers
-
 config P4_RDONLY_EXTRA
 	bool "The extra partition is always mounted as read-only."
 	default n
