@@ -876,6 +876,23 @@ static struct machine_desc * __init setup_machine_tags(unsigned int nr)
 	return mdesc;
 }
 
+/*
+ * HACK: Set androidboot.mode=charger based on the
+ * Samsung p4 charging_mode parameter.
+ */
+static int __init sec_param_charging_mode(char *p)
+{
+	unsigned long charging_mode;
+
+	if (kstrtoul(p, 16, &charging_mode))
+		return 1;
+
+	if (charging_mode)
+		strlcat(boot_command_line, " androidboot.mode=charger", COMMAND_LINE_SIZE);
+
+	return 0;
+}
+early_param("charging_mode", sec_param_charging_mode);
 
 void __init setup_arch(char **cmdline_p)
 {
