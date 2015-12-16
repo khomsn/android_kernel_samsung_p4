@@ -236,7 +236,7 @@
 #define WM8994_GPIO_10                          0x709
 #define WM8994_GPIO_11                          0x70A
 #define WM8994_DIGITAL_PULLS                    0x720
-#define WM8994_PULL_CONTROL_2					0X721
+#define WM8994_PULL_CONTROL_2			0X721
 #define WM8994_INTERRUPT_STATUS_1               0x730
 #define WM8994_INTERRUPT_STATUS_2               0x731
 #define WM8994_INTERRUPT_STATUS_1_MASK          0x738

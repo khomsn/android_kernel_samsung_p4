@@ -146,7 +146,7 @@ enum audio_path	{
 	RING_SPK, RING_HP, RING_NO_MIC, RING_SPK_HP,
 	LINEOUT, SPK_LINEOUT
 };
-enum mic_path		{MAIN, EAR, BT_REC, MIC_OFF};
+enum mic_path		{MAIN, EAR, BT_REC, VOICE_ALL, VOICE_RX, MIC_OFF};
 enum power_state	{CODEC_OFF, CODEC_ON };
 enum ringtone_state	{RING_OFF, RING_ON};
 enum input_source_state	{DEFAULT, RECOGNITION, CAMCORDER};
@@ -271,6 +271,10 @@ void wm8994_set_voicecall_headset(struct snd_soc_codec *codec);
 void wm8994_set_voicecall_headphone(struct snd_soc_codec *codec);
 void wm8994_set_voicecall_speaker(struct snd_soc_codec *codec);
 void wm8994_set_voicecall_bluetooth(struct snd_soc_codec *codec);
+void wm8994_set_recording_during_voicecall(struct snd_soc_codec *codec);
+void wm8994_record_Voice_all(struct snd_soc_codec *codec);
+void wm8994_record_Voice_rx(struct snd_soc_codec *codec);
+
 int wm8994_set_codec_gain(struct snd_soc_codec *codec, u32 mode, u16 device);
 extern int gain_code_check(void);
 u16 wm8994_get_codec_gain(u32 mode, u16 device, u16 reg);

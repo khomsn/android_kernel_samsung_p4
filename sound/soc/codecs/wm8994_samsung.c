@@ -134,6 +134,8 @@ select_mic_route universal_wm8994_mic_paths[] = {
 	wm8994_record_main_mic,
 	wm8994_record_headset_mic,
 	wm8994_record_bluetooth,
+	wm8994_record_Voice_all,
+	wm8994_record_Voice_rx
 };
 
 select_clock_control universal_clock_controls = wm8994_configure_clock;
@@ -291,9 +293,8 @@ static const char *playback_path[] = {
 static const char *voicecall_path[] = {
 	"OFF", "RCV", "SPK", "HP", "HP_NO_MIC", "BT"
 };
-static const char *mic_path[] = {
-	"Main Mic", "Hands Free Mic", "BT Sco Mic", "MIC OFF"
-};
+static const char *mic_path[] = { "Main Mic", "Hands Free Mic",
+					"BT Sco Mic", "Voice", "Voice Rx", "MIC OFF" };
 static const char *input_source_state[] = {
 	"Default", "Voice Recognition", "Camcorder"
 };
@@ -610,6 +611,19 @@ static int wm8994_set_mic_path(struct snd_kcontrol *kcontrol,
 	case 3:
 		wm8994_disable_rec_path(codec);
 		return 0;
+	case 4:
+		wm8994->rec_path = VOICE_ALL;
+		wm8994->pdata->set_dap_connection(0);
+		break;
+	case 5:
+		wm8994->rec_path = VOICE_RX;
+		wm8994->pdata->set_dap_connection(0);
+		break;
+	case 6:
+		wm8994_disable_rec_path(codec);
+		wm8994->pdata->set_dap_connection(0);
+		wm8994->codec_state &= ~(CAPTURE_ACTIVE);
+		return 0;
 	default:
 		return -EINVAL;
 	}
@@ -716,7 +730,21 @@ static int wm8994_set_path(struct snd_kcontrol *kcontrol,
 
 	return 0;
 }
+//add
+static void wm8994_set_tx_mute(struct snd_soc_codec *codec)
+{
+	DEBUG_LOG("%s", __func__);
+	wm8994_write(codec, WM8994_AIF2_ADC_LEFT_VOLUME, 0x100);
+	wm8994_write(codec, WM8994_AIF2_ADC_RIGHT_VOLUME, 0x100);
+}
 
+static void wm8994_set_tx_unmute(struct snd_soc_codec *codec)
+{
+	DEBUG_LOG("%s", __func__);
+	wm8994_write(codec, WM8994_AIF2_ADC_LEFT_VOLUME, 0x1C0);
+	wm8994_write(codec, WM8994_AIF2_ADC_RIGHT_VOLUME, 0x1C0);
+}
+//add end
 static int wm8994_get_voice_path(struct snd_kcontrol *kcontrol,
 				 struct snd_ctl_elem_value *ucontrol)
 {
@@ -758,6 +786,8 @@ static int wm8994_set_voice_path(struct snd_kcontrol *kcontrol,
 	case BT:
 		DEBUG_LOG("routing  voice path to %s\n", mc->texts[path_num]);
 #ifdef CONFIG_MACH_SAMSUNG_VARIATION_TEGRA
+//		wm8994->dap_state = dap_connection_bt_call;
+//		wm8994->pdata->set_dap_connection(wm8994->dap_state);
 		wm8994->pdata->set_dap_connection(1);
 #endif
 		break;
@@ -779,6 +809,9 @@ static int wm8994_set_voice_path(struct snd_kcontrol *kcontrol,
 		val |= (WM8994_AIF1DAC1_UNMUTE);
 		wm8994_write(codec, WM8994_AIF1_DAC1_FILTERS_1, val);
 	}
+	wm8994_set_recording_during_voicecall(codec);
+	
+	wm8994_set_tx_unmute(codec);
 
 	return 0;
 }
